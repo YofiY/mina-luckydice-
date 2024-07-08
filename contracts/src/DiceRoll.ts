@@ -59,17 +59,18 @@ const mod6 = (a: Field) => {
     return divMod6(a).rest.value;
 };
 
+const BET_SIZE = UInt64.from(100)
+
 export class DiceRoll extends SmartContract {
     @state(PublicKey) playerA = State<PublicKey>();
     @state(PublicKey) playerB = State<PublicKey>();
 
-    @state(Field) diceRollA = State<Field>(); // 0000
+    @state(Field) diceRollA = State<Field>(); 
     @state(Field) diceRollB = State<Field>();
 
     @state(Field) inputA = State<Field>();
     @state(Field) inputB = State<Field>(); // 
 
-    @state(Field) betSize = State<UInt64>();
 
     init() {
         super.init();
@@ -82,10 +83,9 @@ export class DiceRoll extends SmartContract {
         this.inputA.set(Field(0));
         this.inputB.set(Field(0));
 
-        this.betSize.set(UInt64.from(0));
     }
 
-    @method async initGame(playerA: PublicKey, playerB: PublicKey, betSize: UInt64) {
+    @method async initGame(playerA: PublicKey, playerB: PublicKey) {
         this.playerA.set(playerA);
         this.playerB.set(playerB);
 
@@ -94,24 +94,20 @@ export class DiceRoll extends SmartContract {
 
         this.inputA.set(Field(0));
         this.inputB.set(Field(0));
-
-        this.betSize.set(betSize);
     }
 
     @method async betDepositA(privateKey: PrivateKey) {
         let playerAPublicKey = privateKey.toPublicKey();
-        let betSize = this.betSize.get();
         this.playerA.requireEquals(playerAPublicKey);
         let playerAAccountUpdate = AccountUpdate.createSigned(playerAPublicKey);
-        playerAAccountUpdate.send({ to: this, amount: new UInt64(betSize) });
+        playerAAccountUpdate.send({ to: this, amount: BET_SIZE });
     }
 
     @method async betDepositB(privateKey: PrivateKey) {
         let playerBPublicKey = privateKey.toPublicKey();
-        let betSize = this.betSize.get();
-        this.playerA.requireEquals(playerBPublicKey);
+        this.playerB.requireEquals(playerBPublicKey);
         let playerAAccountUpdate = AccountUpdate.createSigned(playerBPublicKey);
-        playerAAccountUpdate.send({ to: this, amount: betSize });
+        playerAAccountUpdate.send({ to: this, amount: BET_SIZE});
     }
 
     @method async getInputA(inputA: Field, privateKey: PrivateKey) {
@@ -179,7 +175,6 @@ export class DiceRoll extends SmartContract {
           [Field(0), Field(1), Field(2)]
         );
     
-        const betSize = this.betSize.getAndRequireEquals();
         const payoutAmountA = Provable.switch(
           [
             playerABountySelector.equals(0),
@@ -187,7 +182,7 @@ export class DiceRoll extends SmartContract {
             playerABountySelector.equals(2),
           ],
           UInt64,
-          [betSize, betSize.mul(2), UInt64.from(0)]
+          [BET_SIZE, BET_SIZE.mul(2), UInt64.from(0)]
         );
     
         const payoutAmountB = Provable.switch(
@@ -197,7 +192,7 @@ export class DiceRoll extends SmartContract {
             playerBBountySelector.equals(2),
           ],
           UInt64,
-          [betSize, betSize.mul(2), UInt64.from(0)]
+          [BET_SIZE, BET_SIZE.mul(2), UInt64.from(0)]
         );
     
         const finalOutAmount = Provable.if(isPlayerA, payoutAmountA, payoutAmountB);
