@@ -61,3 +61,22 @@ await playerBDepositTxn.prove();
 await playerBDepositTxn.sign([playerBPrivateKey]).send();
 console.log('player B deposited 100 Mina bet')
 printPlayersBalances();
+
+//player inputs
+let playerAInput = Field(10);
+const playerAInputTxn = await Mina.transaction(playerA, async () => 
+    await diceRollApp.setInputA(playerAInput, playerAPrivateKey)
+);
+await playerAInputTxn.prove();
+await playerAInputTxn.sign([playerAPrivateKey]).send();
+console.log("player A set their input to "+playerAInput.toString());
+console.log("  --> fetching the player A input from smart contract storage ... " + diceRollApp.inputA.get().toString());
+
+let playerBInput = Field(32);
+const playerBInputTxn = await Mina.transaction(playerB, async () => 
+    await diceRollApp.setInputB(playerBInput, playerBPrivateKey)
+);
+await playerBInputTxn.prove();
+await playerBInputTxn.sign([playerBPrivateKey]).send();
+console.log("player B set their input to "+playerBInput.toString());
+console.log("  --> fetching the player B input from smart contract storage ... " + diceRollApp.inputB.get().toString());

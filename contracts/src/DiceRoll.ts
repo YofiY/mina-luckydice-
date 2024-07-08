@@ -81,6 +81,9 @@ export class DiceRoll extends SmartContract {
         this.diceRollB.set(Field(0));
 
         this.inputA.set(Field(0));
+        this.inputB.set(Field(0))
+
+        this.inputA.set(Field(0));
         this.inputB.set(Field(0));
 
     }
@@ -110,18 +113,18 @@ export class DiceRoll extends SmartContract {
         playerAAccountUpdate.send({ to: this, amount: BET_SIZE});
     }
 
-    @method async getInputA(inputA: Field, privateKey: PrivateKey) {
+    @method async setInputA(inputA: Field, privateKey: PrivateKey) {
+        inputA.equals(0).not().assertEquals(true);
         this.playerA.requireEquals(privateKey.toPublicKey());
         this.inputA.requireEquals(Field(0))
         this.inputA.set(inputA);
-        this.inputA.get().equals(0).not().assertEquals(true);
     }
 
-    @method async getInputB(inputB: Field, privateKey: PrivateKey) {
+    @method async setInputB(inputB: Field, privateKey: PrivateKey) {
+        inputB.equals(0).not().assertEquals(true);
         this.playerB.requireEquals(privateKey.toPublicKey())
         this.inputB.requireEquals(Field(0))
         this.inputB.set(inputB);
-        this.inputB.get().equals(0).not().assertEquals(true);
     }
 
     @method async rollDice() {
