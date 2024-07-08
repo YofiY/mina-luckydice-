@@ -1,3 +1,3 @@
-import { Add } from './Add.js';
+import { DiceRoll } from './DiceRoll.js';
 
-export { Add };
+export { DiceRoll };
