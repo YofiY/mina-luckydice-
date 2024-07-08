@@ -32,6 +32,6 @@ const deployTxn = await Mina.transaction(deployerAccount, async () => {
     await diceRollApp.initGame(playerA, playerB, BET_SIZE);
 })
 await deployTxn.prove();
-await deployTxn.sign([deployerKey, diceRollAppPrivateKey])
+await deployTxn.sign([deployerKey, diceRollAppPrivateKey]).send();
 
 console.log('deployed the program');
