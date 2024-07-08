@@ -29,7 +29,7 @@ const PlayerBInput = Field(14)
 const deployTxn = await Mina.transaction(deployerAccount, async () => {
     AccountUpdate.fundNewAccount(deployerAccount);
     await diceRollApp.deploy();
-    await diceRollApp.initGame(playerA, playerB, BET_SIZE);
+    //await diceRollApp.initGame(playerA, playerB, BET_SIZE);
 })
 await deployTxn.prove();
 await deployTxn.sign([deployerKey, diceRollAppPrivateKey]).send();

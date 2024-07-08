@@ -60,19 +60,29 @@ const mod6 = (a: Field) => {
 };
 
 export class DiceRoll extends SmartContract {
-    @state(Field) playerA = State<PublicKey>();
-    @state(Field) playerB = State<PublicKey>();
+    @state(PublicKey) playerA = State<PublicKey>();
+    @state(PublicKey) playerB = State<PublicKey>();
 
-    @state(Field) diceRollA = State<Field>();
+    @state(Field) diceRollA = State<Field>(); // 0000
     @state(Field) diceRollB = State<Field>();
 
     @state(Field) inputA = State<Field>();
-    @state(Field) inputB = State<Field>();
+    @state(Field) inputB = State<Field>(); // 
 
     @state(Field) betSize = State<UInt64>();
 
     init() {
         super.init();
+        this.playerA.set(PublicKey.empty());
+        this.playerB.set(PublicKey.empty());
+
+        this.diceRollA.set(Field(0));
+        this.diceRollB.set(Field(0));
+
+        this.inputA.set(Field(0));
+        this.inputB.set(Field(0));
+
+        this.betSize.set(UInt64.from(0));
     }
 
     @method async initGame(playerA: PublicKey, playerB: PublicKey, betSize: UInt64) {
@@ -202,11 +212,7 @@ export class DiceRoll extends SmartContract {
           amount: finalOutAmount,
         });
       }
-
-
-
-
-}
+    }
 
 
 
