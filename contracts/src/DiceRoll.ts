@@ -27,7 +27,7 @@ export class DiceRoll extends SmartContract {
     @state(Field) inputA = State<Field>();
     @state(Field) inputB = State<Field>();
 
-    @state(Field) betSize = State<BigInt>();
+    @state(Field) betSize = State<UInt64>();
 
     init() {
         super.init();
@@ -44,43 +44,39 @@ export class DiceRoll extends SmartContract {
         this.inputA.set(Field(0));
         this.inputB.set(Field(0));
 
-        this.betSize.set(betSize);
+        this.betSize.set(UInt64.from(0));
     }
 
-    @method async placeBetA(privateKey:PrivateKey) {
-       this.account.provedState.requireEquals(Bool(true));
-       this.playerA.requireEquals(privateKey.toPublicKey());
-       let accountUpdate = AccountUpdate.create(privateKey.toPublicKey());
-       accountUpdate.account.isNew.requireEquals(Bool(true));
-       accountUpdate.account.balance.get().assertGreaterThanOrEqual();
+    @method async betDepositA(privateKey: PrivateKey) {
+        let playerAPublicKey = privateKey.toPublicKey();
+        let betSize = this.betSize.get();
+        this.playerA.requireEquals(playerAPublicKey);
+        let playerAAccountUpdate = AccountUpdate.createSigned(playerAPublicKey);
+        playerAAccountUpdate.send({ to: this, betSize });
     }
 
     @method async getInputA(inputA: Field, privateKey: PrivateKey) {
         this.playerA.requireEquals(privateKey.toPublicKey());
         this.inputA.requireEquals(Field(0))
         this.inputA.set(inputA);
-        this.inputA.get().inv()
+        this.inputA.get().equals(0).not().assertEquals(true);
     }
 
     @method async getInputB(inputB: Field, privateKey: PrivateKey) {
         this.playerB.requireEquals(privateKey.toPublicKey())
         this.inputB.requireEquals(Field(0))
         this.inputB.set(inputB);
-        this.inputA.get().inv();
+        this.inputB.get().equals(0).not().assertEquals(true);
     }
 
     @method async rollDice() {
         let inputA = this.inputA.get();
         this.inputA.requireEquals(inputA);
-        inputA.assertNotEquals(0);
-        inputA.equals(0).not().assertEquals(true
-
-        )
-        inputA.assertGreaterThan(0);
+        inputA.equals(0).not().assertEquals(true);
 
         let inputB = this.inputA.get();
         this.inputB.requireEquals(inputB);
-        inputB.inv();
+        inputB.equals(0).not().assertEquals(true);
 
         let randomSeedA = Poseidon.hash([inputA, inputB]);
         let randomSeedB = Poseidon.hash([randomSeedA]);
