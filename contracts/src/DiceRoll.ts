@@ -104,8 +104,6 @@ export class DiceRoll extends SmartContract {
         playerAAccountUpdate.send({ to: this, amount: betSize });
     }
 
-    @method
-
     @method async getInputA(inputA: Field, privateKey: PrivateKey) {
         this.playerA.requireEquals(privateKey.toPublicKey());
         this.inputA.requireEquals(Field(0))
