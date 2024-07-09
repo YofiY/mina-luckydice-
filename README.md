@@ -10,6 +10,7 @@ This project is a 2-player betting game levraging Mina Protocol's Zero-Knowledge
 
 ## Randomness 
 Once of the current issues when requiring randomness in an on-chain is that is usually requires a trusted setup such as an Oracle. In order to derive a source of randomness, the smart contract requires that both players input two `Field` values. Then it suffices to hash a combination of the two inputs $[input_A, input_B]$ to get a random seed. For every following dice roll, we rehash the previous seed. Thus deriving the following reccurence relation 
+
 $$
 seed_i = 
 \begin{cases} 
@@ -17,6 +18,7 @@ Hash(input_A, input_B) & \text{if } i = 0, \\
 Hash(seed_{i-1}) & \text{else } 
 \end{cases}
 $$ 
+
 In the current implementation the `Poseidon.hash()` function from the o(1)js core library. 
 
 A challenge in this zero-trust environment is that the $Player_B$ must not be aware of $input_A$ at the moment of submitting $input_B$ to the smart contract. In order to avoid this, a handshake inspired by provably fair algorithms can be used: $Player_A$ first submits a $hash(input_A)$ to the smart contract 
