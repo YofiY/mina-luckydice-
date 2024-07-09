@@ -24,7 +24,7 @@ const getPlayerBalance = (playerAddress: PublicKey) => Local.getAccount(playerAd
 const printPlayersBalances = () => {
     console.log("  --> player A Balance : " + getPlayerBalance(playerA));
     console.log("  --> player B Balance : " + getPlayerBalance(playerB));
-    console.log("  --> smart contract Balance: " + getPlayerBalance(diceRollAppAddress));
+    console.log("  --> smart contract Balance: " + getPlayerBalance(diceRollAppAddress)+"\n");
 }
 
 
@@ -70,13 +70,29 @@ const playerAInputTxn = await Mina.transaction(playerA, async () =>
 await playerAInputTxn.prove();
 await playerAInputTxn.sign([playerAPrivateKey]).send();
 console.log("player A set their input to "+playerAInput.toString());
-console.log("  --> fetching the player A input from smart contract storage ... " + diceRollApp.inputA.get().toString());
+console.log("  --> fetching the player A input from smart contract storage ... " + diceRollApp.inputA.get().toString()+"\n");
 
-let playerBInput = Field(32);
+//TODO: get user input
+let playerBInput = Field(21234);
 const playerBInputTxn = await Mina.transaction(playerB, async () => 
     await diceRollApp.setInputB(playerBInput, playerBPrivateKey)
 );
 await playerBInputTxn.prove();
 await playerBInputTxn.sign([playerBPrivateKey]).send();
 console.log("player B set their input to "+playerBInput.toString());
-console.log("  --> fetching the player B input from smart contract storage ... " + diceRollApp.inputB.get().toString());
+console.log("  --> fetching the player B input from smart contract storage ... " + diceRollApp.inputB.get().toString()+"\n");
+
+// roll the dice
+console.log("rolling the two dice")
+const diceRollTxn = await Mina.transaction(playerA, async () =>
+    await diceRollApp.rollDice());
+await diceRollTxn.prove();
+await diceRollTxn.sign([playerAPrivateKey]).send();
+
+let diceRollA = diceRollApp.diceRollA.get()
+let diceRollB = diceRollApp.diceRollB.get()
+
+console.log("  --> outcome of the die A : "+ diceRollA.toString());
+console.log("  --> outcome of the die B : "+ diceRollB.toString()+"\n");
+
+//

@@ -29,8 +29,8 @@ const divMod6 = (b: Field) => {
         let q = xn / yn;
         let r = xn - q * yn;
         return {
-            quotient: new UInt32(new Field(q.toString()).value),
-            rest: new UInt32(new Field(r.toString()).value),
+            //quotient: new UInt64(new Field(q.toString()).value),
+            rest: new UInt64(new Field(r.toString()).value),
         };
     }
 
@@ -47,12 +47,13 @@ const divMod6 = (b: Field) => {
     let r = x.sub(q.mul(y_)).seal();
     Gadgets.rangeCheck32(r);
 
-    let r_ = new UInt32(r.value);
-    let q_ = new UInt32(q.value);
+    let r_ = new UInt64(r.value);
+    let q_ = new UInt64(q.value);
 
-    r_.assertLessThan(new UInt32(y_.value));
+    r_.assertLessThan(new UInt64(y_.value));
 
-    return { quotient: q_, rest: r_ };
+    return { //quotient: q_, 
+        rest: r_ };
 };
 
 const mod6 = (a: Field) => {
@@ -130,17 +131,26 @@ export class DiceRoll extends SmartContract {
     @method async rollDice() {
         let inputA = this.inputA.get();
         this.inputA.requireEquals(inputA);
-        inputA.equals(0).not().assertEquals(true);
 
-        let inputB = this.inputA.get();
+        let inputB = this.inputB.get();
         this.inputB.requireEquals(inputB);
-        inputB.equals(0).not().assertEquals(true);
 
         let randomSeedA = Poseidon.hash([inputA, inputB]);
-        let randomSeedB = Poseidon.hash([randomSeedA]);
+        randomSeedA.assertNotEquals(Field(0));
 
-        this.diceRollA.set(mod6(randomSeedA));
-        this.diceRollB.set(mod6(randomSeedB));
+        let randomSeedB = Poseidon.hash([randomSeedA]);
+        randomSeedB.assertNotEquals(Field(0));
+
+        randomSeedB.assertNotEquals(randomSeedA);
+
+        let diceRollAResult = mod6(randomSeedA);
+        diceRollAResult.assertLessThan(Field(6));
+        
+        let diceRollBResult = mod6(randomSeedB);
+        diceRollBResult.assertLessThan(Field(6));
+
+        this.diceRollA.set(diceRollAResult);
+        this.diceRollB.set(diceRollBResult);
     }
 
     @method async settleGame() {
