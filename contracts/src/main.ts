@@ -104,9 +104,13 @@ if (diceRollA > diceRollB) {
 
 //settling the game
 console.log("settling the game...");
-const settleGameTxn = await Mina.transaction(playerA, async() =>
+const playerAClaimTxn = await Mina.transaction(playerA, async() =>
 await diceRollApp.settleGame());
+await playerAClaimTxn.prove();
+await playerAClaimTxn.sign([playerAPrivateKey, diceRollAppPrivateKey]).send();
 
-//await settleGameTxn.prove();
-//await settleGameTxn.sign([playerAPrivateKey]).send();
+const playerBClaimTxn = await Mina.transaction(playerB, async() => 
+    await diceRollApp.settleGame());
+await playerBClaimTxn.prove();
+await playerBClaimTxn.sign([playerBPrivateKey, diceRollAppPrivateKey]).send();
 printPlayersBalances();

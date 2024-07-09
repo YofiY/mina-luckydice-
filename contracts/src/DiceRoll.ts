@@ -154,6 +154,11 @@ export class DiceRoll extends SmartContract {
     }
 
     @method async settleGame() {
+        this.playerA.requireEquals(this.playerA.get());
+        this.playerB.requireEquals(this.playerB.get());
+        this.diceRollA.requireEquals(this.diceRollA.get());
+        this.diceRollB.requireEquals(this.diceRollB.get());
+
         let diceRollA = this.diceRollA.get();
         let diceRollB = this.diceRollB.get();
 
