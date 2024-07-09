@@ -89,10 +89,24 @@ const diceRollTxn = await Mina.transaction(playerA, async () =>
 await diceRollTxn.prove();
 await diceRollTxn.sign([playerAPrivateKey]).send();
 
-let diceRollA = diceRollApp.diceRollA.get()
-let diceRollB = diceRollApp.diceRollB.get()
+let diceRollA = diceRollApp.diceRollA.get().toBigInt();
+let diceRollB = diceRollApp.diceRollB.get().toBigInt();
 
 console.log("  --> outcome of the die A : "+ diceRollA.toString());
-console.log("  --> outcome of the die B : "+ diceRollB.toString()+"\n");
+console.log("  --> outcome of the die B : "+ diceRollB.toString());
+if (diceRollA > diceRollB) {
+    console.log("congrats to player A for winning the bounty !\n");
+} else if (diceRollB > diceRollA) {
+    console.log("congrats to player B for winning the bounty\n");
+} else {
+    console.log("It's a draw !\n")
+}
 
-//
+//settling the game
+console.log("settling the game...");
+const settleGameTxn = await Mina.transaction(playerA, async() =>
+await diceRollApp.settleGame());
+
+//await settleGameTxn.prove();
+//await settleGameTxn.sign([playerAPrivateKey]).send();
+printPlayersBalances();
